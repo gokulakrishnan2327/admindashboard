@@ -3,6 +3,9 @@ import { Navigate } from 'react-router-dom';
 
 // Dashboard Routes
 const Analytics = lazy(() => import('@/app/(admin)/dashboard/analytics/page'));
+
+const AllUsers = lazy(() => import('@/app/(admin)/dashboard/analytics/components/AllUsers'));
+const UserDetail = lazy(() => import('@/app/(admin)/dashboard/analytics/components/UserDetail'));
 // const Finance = lazy(() => import('@/app/(admin)/dashboard/finance/page'))
 // const Sales = lazy(() => import('@/app/(admin)/dashboard/sales/page'))
 
@@ -134,6 +137,18 @@ const generalRoutes = [{
 //     name: 'Sales',
 //     element: <Sales />,
 //   },
+];
+const userRoutes = [
+  {
+    name: 'All Users',
+    path: '/users/all',
+    element: <AllUsers />
+  },
+  {
+    name: 'User Details',
+    path: '/users/:userId',
+    element: <UserDetail />
+  }
 ];
 const appsRoutes = [
 //   {
@@ -519,4 +534,4 @@ export const authRoutes = [{
   path: '/coming-soon',
   element: <ComingSoon />
 }];
-export const appRoutes = [...initialRoutes, ...generalRoutes, ...appsRoutes, ...customRoutes, ...baseUIRoutes, ...advancedUIRoutes, ...chartsNMapsRoutes, ...formsRoutes, ...tableRoutes, ...iconRoutes, ...authRoutes];
+export const appRoutes = [...initialRoutes, ...generalRoutes,...userRoutes, ...appsRoutes, ...customRoutes, ...baseUIRoutes, ...advancedUIRoutes, ...chartsNMapsRoutes, ...formsRoutes, ...tableRoutes, ...iconRoutes, ...authRoutes];

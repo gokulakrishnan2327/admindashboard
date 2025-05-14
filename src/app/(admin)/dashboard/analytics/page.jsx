@@ -23,7 +23,7 @@ export default function Home() {
           <UserDistribution />
         </Col>
         <Col lg={6}>
-          <UsersList />
+          <UsersList limit={15} showViewAll={true} />
         </Col>
       </Row>
 {/* 

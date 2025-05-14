@@ -2,24 +2,32 @@ import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { useState } from 'react';
 import { Button, Card, CardHeader, CardTitle, Table, Badge, ButtonGroup, Form } from 'react-bootstrap';
 import { usersList } from '../data';
+import { useNavigate } from 'react-router-dom';
 
-const UsersList = () => {
+const UsersList = ({ limit = 15, showViewAll = true }) => {
   const [filter, setFilter] = useState('All');
-  const [displayedUsers, setDisplayedUsers] = useState(usersList);
+  const [displayedUsers, setDisplayedUsers] = useState(
+    limit ? usersList.slice(0, limit) : usersList
+  );
+const navigate = useNavigate();
 
   const handleFilterChange = (selectedFilter) => {
     setFilter(selectedFilter);
     
+    let filteredUsers = usersList;
     if (selectedFilter === 'All') {
-      setDisplayedUsers(usersList);
+      filteredUsers = usersList;
     } else if (selectedFilter === 'Blocked') {
-      setDisplayedUsers(usersList.filter(user => user.status === 'Blocked'));
+      filteredUsers = usersList.filter(user => user.status === 'Blocked');
     } else if (selectedFilter === 'Active') {
-      setDisplayedUsers(usersList.filter(user => user.status === 'Active'));
+      filteredUsers = usersList.filter(user => user.status === 'Active');
     } else {
       // Filter by role
-      setDisplayedUsers(usersList.filter(user => user.role === selectedFilter));
+      filteredUsers = usersList.filter(user => user.role === selectedFilter);
     }
+    
+    // Apply limit if needed
+    setDisplayedUsers(limit ? filteredUsers.slice(0, limit) : filteredUsers);
   };
 
   const handleStatusToggle = (userId) => {
@@ -32,13 +40,24 @@ const UsersList = () => {
       return user;
     });
     
-    // Update both the full list and the filtered list
-    setDisplayedUsers(updatedUsers.filter(user => {
-      if (filter === 'All') return true;
-      if (filter === 'Blocked') return user.status === 'Blocked';
-      if (filter === 'Active') return user.status === 'Active';
-      return user.role === filter;
-    }));
+    let filteredUsers = updatedUsers;
+    if (filter === 'Blocked') {
+      filteredUsers = updatedUsers.filter(user => user.status === 'Blocked');
+    } else if (filter === 'Active') {
+      filteredUsers = updatedUsers.filter(user => user.status === 'Active');
+    } else if (filter !== 'All') {
+      filteredUsers = updatedUsers.filter(user => user.role === filter);
+    }
+    
+    setDisplayedUsers(limit ? filteredUsers.slice(0, limit) : filteredUsers);
+  };
+
+  const handleViewAllClick = () => {
+navigate('/users/all');
+  };
+
+  const handleViewUserDetails = (userId) => {
+navigate(`/users/${userId}`);
   };
 
   return (
@@ -62,6 +81,11 @@ const UsersList = () => {
             <option value="Startup">Startups</option>
             <option value="Mentor">Mentors</option>
           </Form.Select>
+          {showViewAll && (
+            <Button variant="soft-info" size="sm" className="me-2" onClick={handleViewAllClick}>
+              View All
+            </Button>
+          )}
           <Button variant="soft-primary" size="sm">
             Add User
           </Button>
@@ -101,7 +125,10 @@ const UsersList = () => {
                 </td>
                 <td>
                   <ButtonGroup size="sm">
-                    <Button variant="soft-secondary">
+                    <Button 
+                      variant="soft-secondary"
+                      onClick={() => handleViewUserDetails(user.id)}
+                    >
                       <IconifyIcon icon="solar:eye-bold" className="fs-16" />
                     </Button>
                     <Button 
@@ -121,6 +148,13 @@ const UsersList = () => {
           </tbody>
         </Table>
       </div>
+      {showViewAll && displayedUsers.length === limit && (
+        <div className="text-center p-3">
+          <Button variant="soft-secondary" size="sm" onClick={handleViewAllClick}>
+            View All Users
+          </Button>
+        </div>
+      )}
     </Card>
   );
 };
